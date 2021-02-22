@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <errno.h>
 #include <sys/unistd.h> // STDOUT_FILENO, STDERR_FILENO
+
+#include "FreeRTOS.h"
+#include "task.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -84,6 +87,33 @@ int _write(int file, char *ptr, int len)
    // return # of bytes written - as best we can tell
    return (status == HAL_OK ? len : 0);
 }
+
+void Task1(void * pvParameter)
+{
+  /* USER CODE BEGIN 5 */
+	printf("task1 started\r\n");
+
+  /* Infinite loop */
+  for(;;)
+  {
+	  vTaskDelay(500/portTICK_PERIOD_MS);
+	  printf("task1 print\r\n");
+  }
+  /* USER CODE END 5 */
+}
+void Task2(void * pvParameter)
+{
+  /* USER CODE BEGIN 5 */
+	printf("task2 started\r\n");
+
+  /* Infinite loop */
+  for(;;)
+  {
+	  vTaskDelay(1000/portTICK_PERIOD_MS);
+	  printf("task2 print\r\n");
+  }
+  /* USER CODE END 5 */
+}
 /* USER CODE END 0 */
 
 /**
@@ -130,6 +160,9 @@ int main(void)
   printf("LwM2M Client !!\r\n");
   HAL_LPTIM_Counter_Start_IT(&hlptim1,32);
 
+  xTaskCreate (Task1, "TASK1", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
+  xTaskCreate (Task2, "TASK2", configMINIMAL_STACK_SIZE, NULL, 4, NULL);
+  vTaskStartScheduler();
   /* USER CODE END 2 */
 
   /* Infinite loop */
